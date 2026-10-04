@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: fb7d9ac
+_src_path: gh:Qualixto/python-template
+api: false
+author_email: contact@qualixto.com
+author_name: Qualixto
+copyright_holder: Qualixto Ltd
+description: 'A runnable baseline data platform: dlt, DuckDB/MotherDuck, dbt and Dagster,
+    with data contracts, quality gates and CI'
+license: Apache-2.0
+package_name: data_platform_starter
+project_name: Data Platform Starter
+project_slug: data-platform-starter
+python_version: '3.13'

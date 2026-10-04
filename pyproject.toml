@@ -1,0 +1,49 @@
+[project]
+name = "data-platform-starter"
+version = "0.1.0"
+description = "A runnable baseline data platform: dlt, DuckDB/MotherDuck, dbt and Dagster, with data contracts, quality gates and CI"
+readme = "README.md"
+authors = [{ name = "Qualixto", email = "contact@qualixto.com" }]
+license = "Apache-2.0"
+requires-python = ">=3.13"
+dependencies = [
+]
+
+[project.scripts]
+data-platform-starter = "data_platform_starter.__main__:main"
+
+[dependency-groups]
+dev = [
+    "invoke>=3.0.3",
+    "mypy>=2.4.0",
+    "pre-commit>=4.6.2",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.10",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.18,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["data_platform_starter"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 90
+exclude_also = ['if __name__ == "__main__":']
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests", "tasks.py"]
