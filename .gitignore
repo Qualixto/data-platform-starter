@@ -11,3 +11,11 @@ build/
 htmlcov/
 .env
 .DS_Store
+data/*
+!data/.gitkeep
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/.user.yml
+logs/
+.dagster/

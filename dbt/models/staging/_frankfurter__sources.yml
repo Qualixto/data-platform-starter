@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: frankfurter
+    description: ECB reference exchange rates via the Frankfurter API, loaded by dlt.
+    schema: raw_frankfurter
+    tables:
+      - name: currencies
+        description: Currency codes and names. Fully replaced on each load.
+        data_tests:
+          - not_empty
+      - name: exchange_rates
+        description: Daily rates, one row per date and quote currency. Merged incrementally.
+        # The ECB publishes on business days only, so allow for weekends and holidays.
+        loaded_at_field: "rate_date::timestamp"
+        freshness:
+          warn_after: {count: 4, period: day}
+          error_after: {count: 7, period: day}
+        data_tests:
+          - not_empty

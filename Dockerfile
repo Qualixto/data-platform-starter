@@ -13,9 +13,15 @@ COPY README.md ./
 COPY src ./src
 RUN uv sync --locked --no-dev --no-editable
 
-RUN useradd --system --no-create-home app
+COPY dbt ./dbt
+
+# dbt writes target/ and logs/ next to the project, and the warehouse lives in data/.
+RUN useradd --system --no-create-home app \
+    && mkdir data \
+    && chown -R app data dbt
 USER app
 
 ENV PATH="/app/.venv/bin:$PATH"
 
 ENTRYPOINT ["data-platform-starter"]
+CMD ["demo"]
