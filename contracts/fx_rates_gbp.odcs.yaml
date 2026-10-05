@@ -1,0 +1,83 @@
+# Open Data Contract Standard: https://bitol-io.github.io/open-data-contract-standard/
+# tests/test_contract.py fails if this drifts from the dbt model contract.
+apiVersion: v3.0.2
+kind: DataContract
+id: data-platform-starter.fx-rates-gbp
+name: FX rates per GBP
+version: 1.0.0
+status: active
+domain: finance
+dataProduct: fx_rates
+tenant: qualixto
+
+description:
+  purpose: Daily ECB reference exchange rates, expressed as units of each currency per 1 GBP.
+  usage: Valuation and reporting in GBP. Join on rate_date and currency_code.
+  limitations: >
+    The ECB publishes on TARGET business days only, so there are no weekend or
+    holiday rows. Rates are reference rates for information, not dealing rates.
+
+schema:
+  - name: fx_rates_gbp
+    physicalName: product.fx_rates_gbp
+    physicalType: table
+    description: One row per business day and currency.
+    properties:
+      - name: rate_key
+        logicalType: string
+        physicalType: varchar
+        required: true
+        unique: true
+        primaryKey: true
+        primaryKeyPosition: 1
+        description: Natural key, "<rate_date>-<currency_code>".
+      - name: rate_date
+        logicalType: date
+        physicalType: date
+        required: true
+        description: ECB publication date.
+      - name: currency_code
+        logicalType: string
+        physicalType: varchar
+        required: true
+        description: ISO 4217 currency code.
+      - name: currency_name
+        logicalType: string
+        physicalType: varchar
+        required: true
+      - name: rate_per_gbp
+        logicalType: number
+        physicalType: double
+        required: true
+        description: Units of the currency that 1 GBP buys. Always 1 for GBP.
+      - name: change_1d_pct
+        logicalType: number
+        physicalType: double
+        required: false
+        description: Change since the previous business day, in percent. Null on a currency's first day.
+    quality:
+      - type: sql
+        description: The table is never empty.
+        query: select count(*) from product.fx_rates_gbp
+        mustBeGreaterThan: 0
+      - type: sql
+        description: GBP is always exactly 1 GBP.
+        query: select count(*) from product.fx_rates_gbp where currency_code = 'GBP' and rate_per_gbp <> 1
+        mustBe: 0
+
+slaProperties:
+  - property: frequency
+    value: 1
+    unit: d
+  - property: latency
+    value: 2
+    unit: d
+    element: fx_rates_gbp.rate_date
+
+team:
+  - username: data-platform
+    role: owner
+
+support:
+  - channel: email
+    url: mailto:contact@qualixto.com

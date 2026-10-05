@@ -4,21 +4,36 @@ Guidance for AI coding agents working in this repository.
 
 ## Project
 
-Data Platform Starter: A runnable baseline data platform: dlt, DuckDB/MotherDuck, dbt and Dagster, with data contracts, quality gates and CI. Python 3.13, managed with uv, source in `src/data_platform_starter/`.
+Data Platform Starter: a runnable baseline data platform. dlt loads ECB exchange rates from the Frankfurter API into DuckDB (or MotherDuck), dbt models them through raw → stage → curate → product, and Dagster orchestrates both as one asset graph. Python 3.13, managed with uv.
+
+- `src/data_platform_starter/`: `sources.py` (dlt source), `pipeline.py` (dlt pipeline and destination), `transform.py` (dbt runner), `definitions.py` (Dagster), `fixtures/` (recorded API responses).
+- `dbt/`: models in `staging/`, `curated/`, `products/`; data tests in `tests/`; branch-aware schema naming in `macros/`.
+- `contracts/`: ODCS contracts for data products.
 
 ## Commands
 
-Run everything through uv and invoke. CI runs the same tasks, so pass them locally before pushing.
+Run everything through uv and invoke from the repository root (dbt paths are relative to it). CI runs the same tasks, so pass them locally before pushing.
 
 ```sh
-uv run invoke format     # fix lint and formatting
-uv run invoke lint       # ruff, format check, mypy --strict, version pins
-uv run invoke test       # pytest with coverage (fails under 90%)
+uv run invoke demo       # ingest fixtures, dbt build, print summary (offline)
+uv run invoke format     # fix Python and SQL lint and formatting
+uv run invoke lint       # ruff, mypy --strict, sqlfluff, version pins
+uv run invoke test       # unit, contract and end-to-end tests; fails under 90% coverage
 uv run invoke audit      # dependency vulnerability scan
-uv run invoke smoke      # build and start the Docker image
+uv run invoke smoke      # build the Docker image and run the demo in it
+uv run invoke dagster --fixtures   # Dagster UI with the full asset graph, offline
 ```
 
 Add dependencies with `uv add <package>` (or `uv add --dev`). Never edit `uv.lock` by hand.
+
+## Data rules
+
+- **Never call the live API in tests or CI.** Use `fetch_fixtures` or a fake `fetch`; record new responses into `fixtures/` when the source changes.
+- **Every model and source has `not_empty`.** Give every data test a deliberate severity: `error` when the data is wrong, `warn` when it might be.
+- **Product models are contracted.** Changing a product's columns means updating its dbt contract, its ODCS contract in `contracts/`, and bumping the ODCS `version`. `tests/test_contract.py` checks the two match.
+- **Loads must stay idempotent.** Rates merge on `(rate_date, base_currency, quote_currency)`; re-running an ingest must not change row counts.
+- **Layer discipline.** Staging reads only from sources, curated only from staging, products only from curated.
+- SQL is lowercase and linted by sqlfluff with the dbt templater.
 
 ## Conventions
 

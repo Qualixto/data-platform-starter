@@ -1,0 +1,26 @@
+name: data_platform_starter
+version: "1.0.0"
+profile: data_platform_starter
+
+model-paths: [models]
+macro-paths: [macros]
+test-paths: [tests]
+clean-targets: [target, dbt_packages]
+
+models:
+  data_platform_starter:
+    staging:
+      +schema: stage
+      +materialized: view
+    curated:
+      +schema: curate
+      +materialized: table
+    products:
+      +schema: product
+      +materialized: table
+      +contract:
+        enforced: true
+
+data_tests:
+  data_platform_starter:
+    +severity: error

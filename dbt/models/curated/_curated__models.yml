@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: dim_currencies
+    description: One row per currency.
+    data_tests:
+      - not_empty
+    columns:
+      - name: currency_code
+        data_tests: [not_null, unique]
+
+  - name: fct_exchange_rates
+    description: Daily rate of each quote currency per unit of the base currency, including the base itself.
+    data_tests:
+      - not_empty
+    columns:
+      - name: rate_key
+        data_tests: [not_null, unique]
+      - name: rate
+        data_tests: [not_null, positive]
+      - name: quote_currency
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_currencies')
+                field: currency_code

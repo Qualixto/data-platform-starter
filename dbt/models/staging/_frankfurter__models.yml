@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_frankfurter__currencies
+    description: Currencies, renamed to house conventions.
+    data_tests:
+      - not_empty
+    columns:
+      - name: currency_code
+        data_tests: [not_null, unique]
+      - name: currency_name
+        data_tests: [not_null]
+
+  - name: stg_frankfurter__exchange_rates
+    description: Daily rates with explicit types.
+    data_tests:
+      - not_empty
+    columns:
+      - name: rate_date
+        data_tests: [not_null]
+      - name: base_currency
+        data_tests: [not_null]
+      - name: quote_currency
+        data_tests: [not_null]
+      - name: rate
+        data_tests: [not_null, positive]

@@ -7,6 +7,13 @@ authors = [{ name = "Qualixto", email = "contact@qualixto.com" }]
 license = "Apache-2.0"
 requires-python = ">=3.13"
 dependencies = [
+    "dagster>=1.13.25",
+    "dagster-dbt>=0.29.25",
+    "dagster-dlt>=0.29.25",
+    "dbt-core>=1.11",
+    "dbt-duckdb>=1.11.0",
+    "dlt[duckdb,motherduck]>=1.30.0",
+    "duckdb>=1.5.6",
 ]
 
 [project.scripts]
@@ -14,12 +21,17 @@ data-platform-starter = "data_platform_starter.__main__:main"
 
 [dependency-groups]
 dev = [
+    "dagster-webserver>=1.13.25",
     "invoke>=3.0.3",
     "mypy>=2.4.0",
     "pre-commit>=4.6.2",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
+    "pyyaml>=6",
     "ruff>=0.16.10",
+    "sqlfluff>=3",
+    "sqlfluff-templater-dbt>=3",
+    "types-pyyaml>=6.0.12.20260906",
 ]
 
 [build-system]
@@ -29,6 +41,11 @@ build-backend = "uv_build"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov --cov-report=term-missing"
+# Deprecations raised inside Dagster's own code, not ours.
+filterwarnings = [
+    "ignore::DeprecationWarning:dagster.*",
+    "ignore::DeprecationWarning:dagster_dbt.*",
+]
 
 [tool.coverage.run]
 source = ["data_platform_starter"]

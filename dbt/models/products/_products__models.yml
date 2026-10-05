@@ -1,0 +1,39 @@
+version: 2
+
+models:
+  - name: fx_rates_gbp
+    description: >
+      Daily ECB reference rates expressed as units of each currency per 1 GBP.
+      Published under the ODCS contract in contracts/fx_rates_gbp.odcs.yaml.
+    config:
+      meta:
+        owner: data-platform
+        contract: contracts/fx_rates_gbp.odcs.yaml
+    data_tests:
+      - not_empty
+    columns:
+      - name: rate_key
+        data_type: varchar
+        constraints:
+          - type: not_null
+        data_tests: [unique]
+      - name: rate_date
+        data_type: date
+        constraints:
+          - type: not_null
+      - name: currency_code
+        data_type: varchar
+        constraints:
+          - type: not_null
+      - name: currency_name
+        data_type: varchar
+        constraints:
+          - type: not_null
+      - name: rate_per_gbp
+        data_type: double
+        constraints:
+          - type: not_null
+        data_tests: [positive]
+      - name: change_1d_pct
+        data_type: double
+        description: Day-on-day change in percent; null on each currency's first day.

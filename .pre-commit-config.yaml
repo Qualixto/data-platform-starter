@@ -49,6 +49,13 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
+      - id: sqlfluff
+        name: sqlfluff lint
+        entry: uv run sqlfluff lint
+        language: system
+        # The dbt templater opens the DuckDB file, which allows one writer.
+        require_serial: true
+        files: ^dbt/(models|tests)/.*\.sql$
       - id: pytest
         name: pytest
         entry: uv run pytest -q
